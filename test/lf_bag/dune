@@ -1,0 +1,20 @@
+; (rule
+;  (copy ../../src/backoff.ml backoff.ml))
+
+; (rule
+;  (copy ../../src/lf_bag.ml lf_bag.ml))
+
+; (test
+;  (name lf_bag_dscheck)
+;  (libraries atomic dscheck alcotest)
+;  (modules lf_bag lf_bag_dscheck))
+
+(test
+ (name qcheck_lf_bag)
+ (libraries lockfree qcheck qcheck-alcotest)
+ (modules qcheck_lf_bag))
+
+(test
+ (name test_lf_bag)
+ (libraries lockfree alcotest)
+ (modules test_lf_bag))
