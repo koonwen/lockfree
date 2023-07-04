@@ -1,16 +1,16 @@
-open Lockfree__.Lf_bag
+open Lockfree
 
-let () =
-  let t = S.create ~blk_sz:5 () in
+let _test () =
+  let t = Lf_bag.create ~blk_sz:5 () in
   let add10 () =
     for i = 1 to 10 do
-      S.add t i
+      Lf_bag.add t i
     done
   in
   let remove30 () =
     let lst = ref [] in
     for _ = 1 to 30 do
-      lst := S.try_remove_any t :: !lst
+      lst := Lf_bag.try_remove_any t :: !lst
     done;
     let pp_sep ppf () = Format.pp_print_string ppf "; " in
     let pp_v =
@@ -26,6 +26,11 @@ let () =
   add10 ();
   Domain.join d1;
   Domain.join d2;
-  S.print_int_bag t;
+  Lf_bag.print_int_bag t;
   remove30 ();
-  S.print_int_bag t
+  Lf_bag.print_int_bag t
+
+let test () = Alcotest.(check unit) "no errors" () (_test ())
+
+let () =
+  Alcotest.(run "LfBag" [ ("quicktest", [ test_case "quick" `Quick test ]) ])
