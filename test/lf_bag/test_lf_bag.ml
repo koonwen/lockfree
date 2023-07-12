@@ -1,5 +1,9 @@
 open Lockfree
 
+let pp_print_option pp_v ppf v =
+  let pp_none ppf () = Format.pp_print_string ppf "None" in
+  Format.pp_print_option ~none:pp_none pp_v ppf v
+
 let _test () =
   let t = Lf_bag.create ~blk_sz:5 () in
   let add10 () =
@@ -28,6 +32,9 @@ let _test () =
   Domain.join d2;
   Lf_bag.print_int_bag t;
   remove30 ();
+  Format.printf "Removed %a\n"
+    (pp_print_option Format.pp_print_int)
+    (Lf_bag.try_remove_any t);
   Lf_bag.print_int_bag t
 
 let test () = Alcotest.(check unit) "no errors" () (_test ())
