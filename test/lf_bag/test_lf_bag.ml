@@ -35,9 +35,32 @@ let _test () =
   Format.printf "Removed %a\n"
     (pp_print_option Format.pp_print_int)
     (Lf_bag.try_remove_any t);
+  ignore (Lf_bag.try_remove_any t);
+  add10 ();
   Lf_bag.print_int_bag t
 
 let test () = Alcotest.(check unit) "no errors" () (_test ())
 
+let test2 () =
+  Alcotest.(check (option int))
+    "no errors" (Some 1)
+    (let b1 = Lf_bag.create () in
+     let b2 = Lf_bag.create () in
+     Lf_bag.add b1 1;
+     let d =
+       Domain.spawn (fun () ->
+           Lf_bag.add b2 1;
+           Lf_bag.try_remove_any b2)
+     in
+     Domain.join d)
+
 let () =
-  Alcotest.(run "LfBag" [ ("quicktest", [ test_case "quick" `Quick test ]) ])
+  Alcotest.(
+    run "LfBag"
+      [
+        ( "quicktest",
+          [
+            test_case "quick" `Quick test;
+            test_case "thread_local storage" `Quick test2;
+          ] );
+      ])
